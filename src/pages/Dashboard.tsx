@@ -1,7 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, MessageSquare, Users, Activity, LogOut } from 'lucide-react';
+import { Stethoscope, MessageSquare, Users, Activity, LogOut } from 'lucide-react';
 
 export default function Dashboard() {
   const { user, signOut } = useAuth();
@@ -16,7 +16,7 @@ export default function Dashboard() {
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-primary" />
+            <Stethoscope className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Curable
             </h1>
@@ -109,12 +109,17 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* CTA Button */}
-          <div className="text-center">
-            <Button size="lg" className="text-lg px-8 py-6">
-              Get Started with Curable
-            </Button>
-            <p className="text-sm text-muted-foreground mt-4">
+          {/* CTA Buttons */}
+          <div className="text-center space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="text-lg px-8 py-6" asChild>
+                <a href="/symptom-checker">Start Symptom Check</a>
+              </Button>
+              <Button size="lg" variant="outline" className="text-lg px-8 py-6" asChild>
+                <a href="/health-profile">Update Profile</a>
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
               Join thousands of users already improving their health with AI-powered insights
             </p>
           </div>

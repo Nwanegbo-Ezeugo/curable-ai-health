@@ -18,8 +18,8 @@ All colors MUST be HSL.
     --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
 
-    /* Curable brand colors - health-focused green with modern twist */
-    --primary: 145 63% 49%;
+    /* Curable brand colors - medical purple and blue theme */
+    --primary: 268 83% 58%;
     --primary-foreground: 220 13% 9%;
 
     --secondary: 220 13% 14%;
@@ -28,7 +28,7 @@ All colors MUST be HSL.
     --muted: 220 13% 14%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 145 63% 49%;
+    --accent: 217 91% 60%;
     --accent-foreground: 220 13% 9%;
 
     --destructive: 0 84.2% 60.2%;
@@ -36,26 +36,26 @@ All colors MUST be HSL.
 
     --border: 220 13% 18%;
     --input: 220 13% 14%;
-    --ring: 145 63% 49%;
+    --ring: 268 83% 58%;
 
     --radius: 0.75rem;
 
     /* Gradients for modern feel */
-    --gradient-primary: linear-gradient(135deg, hsl(145 63% 49%), hsl(145 63% 42%));
+    --gradient-primary: linear-gradient(135deg, hsl(268 83% 58%), hsl(217 91% 60%));
     --gradient-card: linear-gradient(135deg, hsl(220 13% 10%), hsl(220 13% 12%));
     
     /* Shadows for depth */
-    --shadow-glow: 0 0 40px hsl(145 63% 49% / 0.15);
+    --shadow-glow: 0 0 40px hsl(268 83% 58% / 0.15);
     --shadow-card: 0 4px 6px -1px hsl(220 13% 4% / 0.1), 0 2px 4px -1px hsl(220 13% 4% / 0.06);
 
     --sidebar-background: 220 13% 9%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 145 63% 49%;
+    --sidebar-primary: 268 83% 58%;
     --sidebar-primary-foreground: 220 13% 9%;
     --sidebar-accent: 220 13% 14%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 220 13% 18%;
-    --sidebar-ring: 145 63% 49%;
+    --sidebar-ring: 268 83% 58%;
   }
 
   .dark {
@@ -69,7 +69,7 @@ All colors MUST be HSL.
     --popover: 220 13% 9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 145 63% 49%;
+    --primary: 268 83% 58%;
     --primary-foreground: 220 13% 9%;
 
     --secondary: 220 13% 14%;
@@ -78,7 +78,7 @@ All colors MUST be HSL.
     --muted: 220 13% 14%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 145 63% 49%;
+    --accent: 217 91% 60%;
     --accent-foreground: 220 13% 9%;
 
     --destructive: 0 84.2% 60.2%;
@@ -86,16 +86,16 @@ All colors MUST be HSL.
 
     --border: 220 13% 18%;
     --input: 220 13% 14%;
-    --ring: 145 63% 49%;
+    --ring: 268 83% 58%;
 
     --sidebar-background: 220 13% 9%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 145 63% 49%;
+    --sidebar-primary: 268 83% 58%;
     --sidebar-primary-foreground: 220 13% 9%;
     --sidebar-accent: 220 13% 14%;
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 220 13% 18%;
-    --sidebar-ring: 145 63% 49%;
+    --sidebar-ring: 268 83% 58%;
   }
 }
 

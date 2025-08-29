@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "./hooks/useAuth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import SymptomChecker from "./pages/SymptomChecker";
+import HealthProfile from "./pages/HealthProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,6 +70,16 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/symptom-checker" element={
+              <ProtectedRoute>
+                <SymptomChecker />
+              </ProtectedRoute>
+            } />
+            <Route path="/health-profile" element={
+              <ProtectedRoute>
+                <HealthProfile />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

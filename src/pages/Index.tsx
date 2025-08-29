@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, MessageSquare, Users, Activity, ArrowRight } from 'lucide-react';
+import { Stethoscope, MessageSquare, Users, Activity, ArrowRight } from 'lucide-react';
 
 const Index = () => {
   return (
@@ -10,7 +10,7 @@ const Index = () => {
       <header className="border-b border-border/50 bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-primary" />
+            <Stethoscope className="h-6 w-6 text-primary" />
             <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Curable
             </h1>
