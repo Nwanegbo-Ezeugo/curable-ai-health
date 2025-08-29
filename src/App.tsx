@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import SymptomChecker from "./pages/SymptomChecker";
 import HealthProfile from "./pages/HealthProfile";
+import Medications from "./pages/Medications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,6 +81,11 @@ const App = () => (
             <Route path="/health-profile" element={
               <ProtectedRoute>
                 <HealthProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/medications" element={
+              <ProtectedRoute>
+                <Medications />
               </ProtectedRoute>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

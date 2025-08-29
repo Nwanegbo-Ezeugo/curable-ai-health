@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Stethoscope, User, LogOut, Save, Calculator, Heart } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Stethoscope, User, Activity, Heart, LogOut, BarChart3, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import DailyHealthQuestions from '@/components/DailyHealthQuestions';
+import HealthCharts from '@/components/HealthCharts';
 
 interface Profile {
   id: string;
@@ -28,119 +30,94 @@ interface Profile {
 export default function HealthProfile() {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const [formData, setFormData] = useState({
+  const [profile, setProfile] = useState<Profile>({
+    id: '',
     full_name: '',
+    age: 0,
     gender: '',
-    height: '',
-    weight: '',
-    genotype: '',
-    blood_group: ''
+    height_cm: 0,
+    weight_kg: 0,
+    blood_group: '',
+    genotype: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchProfile();
+    if (user) {
+      fetchProfile();
+    }
   }, [user]);
 
   const fetchProfile = async () => {
     if (!user) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error fetching profile:', error);
-        return;
-      }
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching profile:', error);
+      return;
+    }
 
-      if (data) {
-        setProfile(data);
-        setFormData({
-          full_name: data.full_name || '',
-          gender: data.gender || '',
-          height: data.height_cm?.toString() || '',
-          weight: data.weight_kg?.toString() || '',
-          genotype: data.genotype || '',
-          blood_group: data.blood_group || ''
-        });
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
+    if (data) {
+      setProfile(data);
+    } else {
+      setProfile(prev => ({ ...prev, id: user.id }));
     }
   };
 
-  const calculateBMI = (height: number, weight: number): number => {
-    const heightInMeters = height / 100;
-    return parseFloat((weight / (heightInMeters * heightInMeters)).toFixed(1));
+  const calculateBMI = () => {
+    if (profile.height_cm && profile.weight_kg) {
+      const heightInMeters = profile.height_cm / 100;
+      return profile.weight_kg / (heightInMeters * heightInMeters);
+    }
+    return 0;
   };
 
-  const getBMICategory = (bmi: number): { category: string; color: string } => {
-    if (bmi < 18.5) return { category: 'Underweight', color: 'secondary' };
-    if (bmi < 25) return { category: 'Normal', color: 'primary' };
-    if (bmi < 30) return { category: 'Overweight', color: 'secondary' };
-    return { category: 'Obese', color: 'destructive' };
+  const getBMICategory = (bmi: number) => {
+    if (bmi < 18.5) return 'Underweight';
+    if (bmi < 25) return 'Normal';
+    if (bmi < 30) return 'Overweight';
+    return 'Obese';
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!user) return;
 
-    setSaving(true);
-    try {
-      const height = parseFloat(formData.height);
-      const weight = parseFloat(formData.weight);
-      const bmi = height && weight ? calculateBMI(height, weight) : null;
+    setIsLoading(true);
 
+    try {
+      const bmi = calculateBMI();
       const profileData = {
+        ...profile,
         id: user.id,
-        full_name: formData.full_name || null,
-        gender: formData.gender || null,
-        height_cm: height || null,
-        weight_kg: weight || null,
-        bmi: bmi,
-        genotype: formData.genotype || null,
-        blood_group: formData.blood_group || null,
+        bmi: bmi > 0 ? bmi : null,
         updated_at: new Date().toISOString()
       };
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('profiles')
-        .upsert(profileData, { onConflict: 'id' })
-        .select()
-        .single();
+        .upsert(profileData, { onConflict: 'id' });
 
-      if (error) {
-        console.error('Error saving profile:', error);
-        toast({
-          title: "Error",
-          description: "Failed to save profile. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (error) throw error;
 
-      setProfile(data);
       toast({
-        title: "Success",
-        description: "Profile saved successfully!",
+        title: "Profile updated",
+        description: "Your health profile has been saved successfully.",
       });
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error saving profile:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
-        variant: "destructive",
+        description: "Failed to save profile. Please try again.",
+        variant: "destructive"
       });
     } finally {
-      setSaving(false);
+      setIsLoading(false);
     }
   };
 
@@ -148,22 +125,7 @@ export default function HealthProfile() {
     await signOut();
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Stethoscope className="h-8 w-8 text-primary mx-auto mb-4 animate-pulse" />
-          <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const currentBMI = formData.height && formData.weight 
-    ? calculateBMI(parseFloat(formData.height), parseFloat(formData.weight))
-    : profile?.bmi;
-
-  const bmiInfo = currentBMI ? getBMICategory(currentBMI) : null;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -190,174 +152,216 @@ export default function HealthProfile() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-4">
               Health{' '}
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                Profile
+                Dashboard
               </span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Manage your personal health information for better AI assessments and personalized care.
+              Track your daily health, view trends, and manage your health profile.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Personal Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-primary" />
-                  Personal Information
-                </CardTitle>
-                <CardDescription>
-                  Basic demographic information
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    value={formData.full_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
-                    placeholder="Enter your full name"
-                  />
-                </div>
+          <Tabs defaultValue="daily" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="daily" className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Daily Check
+              </TabsTrigger>
+              <TabsTrigger value="trends" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Health Trends
+              </TabsTrigger>
+              <TabsTrigger value="profile" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Profile
+              </TabsTrigger>
+            </TabsList>
 
-
-                <div>
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select 
-                    value={formData.gender} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, gender: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                      <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Health Metrics */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-primary" />
-                  Health Metrics
-                </CardTitle>
-                <CardDescription>
-                  Physical measurements and health indicators
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="height">Height (cm)</Label>
-                    <Input
-                      id="height"
-                      type="number"
-                      value={formData.height}
-                      onChange={(e) => setFormData(prev => ({ ...prev, height: e.target.value }))}
-                      placeholder="170"
-                    />
+            {/* Daily Health Check Tab */}
+            <TabsContent value="daily" className="space-y-6">
+              <DailyHealthQuestions />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>
+                    Manage your health data and access other features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Button asChild variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                      <a href="/symptom-checker">
+                        <Stethoscope className="h-6 w-6" />
+                        <div className="text-center">
+                          <div className="font-medium">Symptom Checker</div>
+                          <div className="text-xs text-muted-foreground">AI-powered health assessment</div>
+                        </div>
+                      </a>
+                    </Button>
+                    <Button asChild variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
+                      <a href="/medications">
+                        <Heart className="h-6 w-6" />
+                        <div className="text-center">
+                          <div className="font-medium">My Medications</div>
+                          <div className="text-xs text-muted-foreground">Track current medications</div>
+                        </div>
+                      </a>
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor="weight">Weight (kg)</Label>
-                    <Input
-                      id="weight"
-                      type="number"
-                      value={formData.weight}
-                      onChange={(e) => setFormData(prev => ({ ...prev, weight: e.target.value }))}
-                      placeholder="70"
-                    />
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                {currentBMI && bmiInfo && (
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">BMI: {currentBMI}</span>
-                      <Badge variant={bmiInfo.color as any}>
-                        {bmiInfo.category}
-                      </Badge>
+            {/* Health Trends Tab */}
+            <TabsContent value="trends">
+              <HealthCharts />
+            </TabsContent>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-primary" />
+                    Personal Information
+                  </CardTitle>
+                  <CardDescription>
+                    Update your basic health information
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Personal Info */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="full_name">Full Name</Label>
+                        <Input
+                          id="full_name"
+                          value={profile.full_name}
+                          onChange={(e) => setProfile(prev => ({ ...prev, full_name: e.target.value }))}
+                          placeholder="Enter your full name"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="age">Age</Label>
+                        <Input
+                          id="age"
+                          type="number"
+                          value={profile.age}
+                          onChange={(e) => setProfile(prev => ({ ...prev, age: parseInt(e.target.value) || 0 }))}
+                          placeholder="Enter your age"
+                        />
+                      </div>
                     </div>
-                  </div>
-                )}
 
-                <div>
-                  <Label htmlFor="genotype">Genotype</Label>
-                  <Select 
-                    value={formData.genotype} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, genotype: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select genotype" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AA">AA</SelectItem>
-                      <SelectItem value="AS">AS</SelectItem>
-                      <SelectItem value="SS">SS</SelectItem>
-                      <SelectItem value="AC">AC</SelectItem>
-                      <SelectItem value="SC">SC</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="gender">Gender</Label>
+                        <Select value={profile.gender} onValueChange={(value) => setProfile(prev => ({ ...prev, gender: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                            <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="blood_group">Blood Group</Label>
+                        <Select value={profile.blood_group} onValueChange={(value) => setProfile(prev => ({ ...prev, blood_group: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select blood group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="A+">A+</SelectItem>
+                            <SelectItem value="A-">A-</SelectItem>
+                            <SelectItem value="B+">B+</SelectItem>
+                            <SelectItem value="B-">B-</SelectItem>
+                            <SelectItem value="AB+">AB+</SelectItem>
+                            <SelectItem value="AB-">AB-</SelectItem>
+                            <SelectItem value="O+">O+</SelectItem>
+                            <SelectItem value="O-">O-</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-                <div>
-                  <Label htmlFor="blood_group">Blood Group</Label>
-                  <Select 
-                    value={formData.blood_group} 
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, blood_group: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select blood group" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="A+">A+</SelectItem>
-                      <SelectItem value="A-">A-</SelectItem>
-                      <SelectItem value="B+">B+</SelectItem>
-                      <SelectItem value="B-">B-</SelectItem>
-                      <SelectItem value="AB+">AB+</SelectItem>
-                      <SelectItem value="AB-">AB-</SelectItem>
-                      <SelectItem value="O+">O+</SelectItem>
-                      <SelectItem value="O-">O-</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                    <div>
+                      <Label htmlFor="genotype">Genotype</Label>
+                      <Select value={profile.genotype} onValueChange={(value) => setProfile(prev => ({ ...prev, genotype: value }))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select genotype" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AA">AA</SelectItem>
+                          <SelectItem value="AS">AS</SelectItem>
+                          <SelectItem value="SS">SS</SelectItem>
+                          <SelectItem value="AC">AC</SelectItem>
+                          <SelectItem value="SC">SC</SelectItem>
+                          <SelectItem value="CC">CC</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-          {/* Save Button */}
-          <div className="mt-6 text-center">
-            <Button 
-              onClick={handleSave} 
-              disabled={saving}
-              size="lg"
-              className="min-w-32"
-            >
-              {saving ? (
-                <>
-                  <Calculator className="h-4 w-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Profile
-                </>
-              )}
-            </Button>
-          </div>
+                    {/* Physical Health */}
+                    <div className="border-t pt-6">
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-primary" />
+                        Physical Health
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="height_cm">Height (cm)</Label>
+                          <Input
+                            id="height_cm"
+                            type="number"
+                            step="0.1"
+                            value={profile.height_cm}
+                            onChange={(e) => setProfile(prev => ({ ...prev, height_cm: parseFloat(e.target.value) || 0 }))}
+                            placeholder="Enter height in cm"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="weight_kg">Weight (kg)</Label>
+                          <Input
+                            id="weight_kg"
+                            type="number"
+                            step="0.1"
+                            value={profile.weight_kg}
+                            onChange={(e) => setProfile(prev => ({ ...prev, weight_kg: parseFloat(e.target.value) || 0 }))}
+                            placeholder="Enter weight in kg"
+                          />
+                        </div>
+                      </div>
+
+                      {/* BMI Display */}
+                      {profile.height_cm && profile.height_cm > 0 && profile.weight_kg && profile.weight_kg > 0 && (
+                        <div className="mt-4 p-4 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Heart className="h-4 w-4 text-primary" />
+                            <span className="font-medium">BMI: {calculateBMI().toFixed(1)}</span>
+                            <span className="text-sm text-muted-foreground">({getBMICategory(calculateBMI())})</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <Button type="submit" disabled={isLoading} className="w-full">
+                      {isLoading ? 'Updating...' : 'Update Profile'}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

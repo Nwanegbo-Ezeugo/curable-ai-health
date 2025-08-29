@@ -14,6 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_questions: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          questions_answered: Json | null
+          questions_shown: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          questions_answered?: Json | null
+          questions_shown?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          questions_answered?: Json | null
+          questions_shown?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      health_tracking: {
+        Row: {
+          appetite: string | null
+          bowel_movement: string | null
+          created_at: string
+          date: string
+          exercise_done: boolean | null
+          exercise_intensity: string | null
+          id: string
+          medications_taken: boolean | null
+          menstrual_period_date: string | null
+          mood: string | null
+          new_symptoms: string[] | null
+          pain_experienced: boolean | null
+          pain_location: string | null
+          sleep_hours: number | null
+          stress_level: string | null
+          updated_at: string
+          urine_changes: string | null
+          user_id: string
+          water_intake_cups: number | null
+        }
+        Insert: {
+          appetite?: string | null
+          bowel_movement?: string | null
+          created_at?: string
+          date?: string
+          exercise_done?: boolean | null
+          exercise_intensity?: string | null
+          id?: string
+          medications_taken?: boolean | null
+          menstrual_period_date?: string | null
+          mood?: string | null
+          new_symptoms?: string[] | null
+          pain_experienced?: boolean | null
+          pain_location?: string | null
+          sleep_hours?: number | null
+          stress_level?: string | null
+          updated_at?: string
+          urine_changes?: string | null
+          user_id: string
+          water_intake_cups?: number | null
+        }
+        Update: {
+          appetite?: string | null
+          bowel_movement?: string | null
+          created_at?: string
+          date?: string
+          exercise_done?: boolean | null
+          exercise_intensity?: string | null
+          id?: string
+          medications_taken?: boolean | null
+          menstrual_period_date?: string | null
+          mood?: string | null
+          new_symptoms?: string[] | null
+          pain_experienced?: boolean | null
+          pain_location?: string | null
+          sleep_hours?: number | null
+          stress_level?: string | null
+          updated_at?: string
+          urine_changes?: string | null
+          user_id?: string
+          water_intake_cups?: number | null
+        }
+        Relationships: []
+      }
+      medications: {
+        Row: {
+          created_at: string
+          dosage: string | null
+          end_date: string | null
+          frequency: string | null
+          id: string
+          is_prescribed: boolean | null
+          medication_name: string
+          notes: string | null
+          start_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dosage?: string | null
+          end_date?: string | null
+          frequency?: string | null
+          id?: string
+          is_prescribed?: boolean | null
+          medication_name: string
+          notes?: string | null
+          start_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dosage?: string | null
+          end_date?: string | null
+          frequency?: string | null
+          id?: string
+          is_prescribed?: boolean | null
+          medication_name?: string
+          notes?: string | null
+          start_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
@@ -56,6 +191,45 @@ export type Database = {
           id?: string
           updated_at?: string | null
           weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      symptom_assessments: {
+        Row: {
+          ai_diagnosis: string
+          confidence_score: number | null
+          created_at: string
+          doctor_reviewed: boolean | null
+          id: string
+          recommendations: string[] | null
+          suspected_conditions: string[] | null
+          symptoms: string
+          urgency_level: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_diagnosis: string
+          confidence_score?: number | null
+          created_at?: string
+          doctor_reviewed?: boolean | null
+          id?: string
+          recommendations?: string[] | null
+          suspected_conditions?: string[] | null
+          symptoms: string
+          urgency_level?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_diagnosis?: string
+          confidence_score?: number | null
+          created_at?: string
+          doctor_reviewed?: boolean | null
+          id?: string
+          recommendations?: string[] | null
+          suspected_conditions?: string[] | null
+          symptoms?: string
+          urgency_level?: string | null
+          user_id?: string
         }
         Relationships: []
       }
