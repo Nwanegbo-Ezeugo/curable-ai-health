@@ -108,10 +108,31 @@ All colors MUST be HSL.
     @apply bg-background text-foreground font-sans antialiased;
     /* Force dark mode globally */
     color-scheme: dark;
+    /* Mobile optimizations */
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     /* Force dark mode */
     @apply dark;
+  }
+
+  /* Mobile-first responsive typography */
+  h1 { @apply text-2xl sm:text-3xl; }
+  h2 { @apply text-xl sm:text-2xl lg:text-3xl; }
+  h3 { @apply text-lg sm:text-xl; }
+  
+  /* Touch-friendly interactive elements */
+  button, [role="button"], a {
+    min-height: 44px; /* iOS accessibility guideline */
+    touch-action: manipulation;
+  }
+  
+  /* Improve tap targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 }
