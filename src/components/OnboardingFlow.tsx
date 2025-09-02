@@ -108,9 +108,8 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
           onboarding_completed: true,
           full_name: data.full_name,
           height_cm: data.height_cm,
-          weight_kg: data.weight_kg,
-          // Calculate BMI
-          bmi: data.weight_kg / Math.pow(data.height_cm / 100, 2)
+          weight_kg: data.weight_kg
+          // BMI is auto-calculated by the database as a generated column
         });
 
       if (profileError) throw profileError;
