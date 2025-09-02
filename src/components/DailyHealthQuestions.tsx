@@ -19,79 +19,90 @@ interface DailyQuestion {
   field: string;
 }
 
+// Updated to match Curable spec - rotating daily questions
 const DAILY_QUESTIONS_POOL: DailyQuestion[] = [
+  // Sleep Category
   {
-    id: 'sleep',
+    id: 'sleep_hours',
     question: 'How many hours did you sleep last night?',
     type: 'number',
     field: 'sleep_hours'
   },
   {
-    id: 'stress',
-    question: 'How stressed do you feel today?',
+    id: 'sleep_quality',
+    question: 'How refreshed do you feel today?',
     type: 'radio',
-    options: ['Low', 'Medium', 'High'],
-    field: 'stress_level'
+    options: ['Very refreshed (5)', 'Refreshed (4)', 'Neutral (3)', 'Tired (2)', 'Exhausted (1)'],
+    field: 'mood'
+  },
+  
+  // Energy & Mood Category
+  {
+    id: 'energy_level',
+    question: 'How is your energy level today?',
+    type: 'radio',
+    options: ['Very high (5)', 'High (4)', 'Moderate (3)', 'Low (2)', 'Very low (1)'],
+    field: 'mood'
   },
   {
-    id: 'water',
-    question: 'Did you drink water today? (approx. cups if yes)',
-    type: 'number',
-    field: 'water_intake_cups'
-  },
-  {
-    id: 'exercise',
-    question: 'Did you exercise today?',
+    id: 'mood',
+    question: 'How is your mood today?',
     type: 'radio',
-    options: ['No', 'Light', 'Moderate', 'Intense'],
-    field: 'exercise_done'
+    options: ['Happy', 'Neutral', 'Sad', 'Stressed', 'Angry'],
+    field: 'mood'
   },
+  
+  // Nutrition & Hydration Category
   {
-    id: 'appetite',
-    question: "How's your appetite today?",
+    id: 'meals',
+    question: 'Did you eat at least 2 proper meals yesterday?',
     type: 'radio',
-    options: ['Good', 'Poor', 'Skipped meals'],
+    options: ['Yes', 'No'],
     field: 'appetite'
   },
   {
+    id: 'water',
+    question: 'How many cups of water did you drink yesterday?',
+    type: 'number',
+    field: 'water_intake_cups'
+  },
+  
+  // Activity & Movement Category
+  {
+    id: 'exercise',
+    question: 'Did you do any physical activity today?',
+    type: 'radio',
+    options: ['No', 'Walking', 'Running', 'Sports', 'Gym', 'Other'],
+    field: 'exercise_intensity'
+  },
+  
+  // Symptoms & Body Signals Category
+  {
     id: 'pain',
-    question: 'Have you experienced any unusual pain today?',
+    question: 'Are you experiencing any pain today?',
     type: 'text',
     field: 'pain_location'
   },
   {
     id: 'symptoms',
-    question: 'Any new symptoms today? (Cough, fever, headache, tiredness, etc.)',
+    question: 'Any unusual symptoms today? (Cough, Fever, Headache, Stomach ache, Other)',
     type: 'text',
     field: 'new_symptoms'
   },
+  
+  // Medication Adherence Category
   {
-    id: 'mood',
-    question: "How's your mood today?",
+    id: 'medications_taken',
+    question: 'Did you take your prescribed medication today?',
     type: 'radio',
-    options: ['Happy', 'Neutral', 'Sad', 'Anxious'],
-    field: 'mood'
-  },
-  {
-    id: 'medications',
-    question: 'Did you take your medications today?',
-    type: 'radio',
-    options: ['Yes', 'No', 'Forgot'],
+    options: ['Yes', 'No', 'Not applicable'],
     field: 'medications_taken'
   },
   {
-    id: 'bowel',
-    question: 'How many bowel movements today?',
-    type: 'radio',
-    options: ['Normal', 'Loose', 'Constipated'],
-    field: 'bowel_movement'
-  },
-  {
-    id: 'urine',
-    question: 'Did you notice any changes in your urine?',
-    type: 'radio',
-    options: ['Normal', 'Dark', 'Painful', 'Frequent'],
-    field: 'urine_changes'
+    id: 'medication_side_effects',
+    question: 'Any side effects noticed from medications?',
+    type: 'text',
+    field: 'new_symptoms'
   }
 ];
 

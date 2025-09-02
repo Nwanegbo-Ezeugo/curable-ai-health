@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       daily_questions: {
         Row: {
+          checkin_type: string | null
           created_at: string
           date: string
           id: string
@@ -24,6 +25,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          checkin_type?: string | null
           created_at?: string
           date?: string
           id?: string
@@ -32,12 +34,55 @@ export type Database = {
           user_id: string
         }
         Update: {
+          checkin_type?: string | null
           created_at?: string
           date?: string
           id?: string
           questions_answered?: Json | null
           questions_shown?: string[] | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      emergency_checkins: {
+        Row: {
+          ai_assessment: string | null
+          created_at: string | null
+          getting_worse: boolean | null
+          id: string
+          medication_taken: string | null
+          severity_level: string
+          symptom_description: string
+          symptom_start_time: string | null
+          urgency_score: number | null
+          user_id: string
+          wants_doctor_connection: boolean | null
+        }
+        Insert: {
+          ai_assessment?: string | null
+          created_at?: string | null
+          getting_worse?: boolean | null
+          id?: string
+          medication_taken?: string | null
+          severity_level: string
+          symptom_description: string
+          symptom_start_time?: string | null
+          urgency_score?: number | null
+          user_id: string
+          wants_doctor_connection?: boolean | null
+        }
+        Update: {
+          ai_assessment?: string | null
+          created_at?: string | null
+          getting_worse?: boolean | null
+          id?: string
+          medication_taken?: string | null
+          severity_level?: string
+          symptom_description?: string
+          symptom_start_time?: string | null
+          urgency_score?: number | null
+          user_id?: string
+          wants_doctor_connection?: boolean | null
         }
         Relationships: []
       }
@@ -149,9 +194,70 @@ export type Database = {
         }
         Relationships: []
       }
+      onboarding: {
+        Row: {
+          alcohol_drinker: boolean | null
+          blood_group: string | null
+          chronic_conditions: string[] | null
+          completed_at: string | null
+          created_at: string | null
+          date_of_birth: string | null
+          family_history: string[] | null
+          full_name: string | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          location: string | null
+          long_term_medications: string[] | null
+          smoker: boolean | null
+          updated_at: string | null
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          alcohol_drinker?: boolean | null
+          blood_group?: string | null
+          chronic_conditions?: string[] | null
+          completed_at?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          family_history?: string[] | null
+          full_name?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          location?: string | null
+          long_term_medications?: string[] | null
+          smoker?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          alcohol_drinker?: boolean | null
+          blood_group?: string | null
+          chronic_conditions?: string[] | null
+          completed_at?: string | null
+          created_at?: string | null
+          date_of_birth?: string | null
+          family_history?: string[] | null
+          full_name?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          location?: string | null
+          long_term_medications?: string[] | null
+          smoker?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
+          baseline_established: boolean | null
           blood_group: string | null
           bmi: number | null
           created_at: string | null
@@ -161,11 +267,13 @@ export type Database = {
           genotype: string | null
           height_cm: number | null
           id: string
+          onboarding_completed: boolean | null
           updated_at: string | null
           weight_kg: number | null
         }
         Insert: {
           age?: number | null
+          baseline_established?: boolean | null
           blood_group?: string | null
           bmi?: number | null
           created_at?: string | null
@@ -175,11 +283,13 @@ export type Database = {
           genotype?: string | null
           height_cm?: number | null
           id: string
+          onboarding_completed?: boolean | null
           updated_at?: string | null
           weight_kg?: number | null
         }
         Update: {
           age?: number | null
+          baseline_established?: boolean | null
           blood_group?: string | null
           bmi?: number | null
           created_at?: string | null
@@ -189,6 +299,7 @@ export type Database = {
           genotype?: string | null
           height_cm?: number | null
           id?: string
+          onboarding_completed?: boolean | null
           updated_at?: string | null
           weight_kg?: number | null
         }
@@ -230,6 +341,51 @@ export type Database = {
           symptoms?: string
           urgency_level?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_checkins: {
+        Row: {
+          average_sleep_hours: number | null
+          completed_at: string | null
+          created_at: string | null
+          exercise_frequency_per_week: number | null
+          family_history_updates: string[] | null
+          fruit_vegetable_frequency: string | null
+          id: string
+          lifestyle_changes: string | null
+          smoking_drinking_frequency: boolean | null
+          stress_level: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Insert: {
+          average_sleep_hours?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_frequency_per_week?: number | null
+          family_history_updates?: string[] | null
+          fruit_vegetable_frequency?: string | null
+          id?: string
+          lifestyle_changes?: string | null
+          smoking_drinking_frequency?: boolean | null
+          stress_level?: string | null
+          user_id: string
+          week_start_date: string
+        }
+        Update: {
+          average_sleep_hours?: number | null
+          completed_at?: string | null
+          created_at?: string | null
+          exercise_frequency_per_week?: number | null
+          family_history_updates?: string[] | null
+          fruit_vegetable_frequency?: string | null
+          id?: string
+          lifestyle_changes?: string | null
+          smoking_drinking_frequency?: boolean | null
+          stress_level?: string | null
+          user_id?: string
+          week_start_date?: string
         }
         Relationships: []
       }
