@@ -25,7 +25,11 @@ interface WeeklyData {
 const STRESS_LEVELS = ['Rarely', 'Sometimes', 'Often', 'Always'];
 const FRUIT_VEG_FREQUENCY = ['Never', '1-2 times', '3-5 times', 'Daily'];
 
-export default function WeeklyCheckin() {
+interface WeeklyCheckinProps {
+  onComplete?: () => void;
+}
+
+export default function WeeklyCheckin({ onComplete }: WeeklyCheckinProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isCompleted, setIsCompleted] = useState(false);
@@ -126,6 +130,11 @@ export default function WeeklyCheckin() {
         title: "Weekly check-in completed!",
         description: "Thank you for providing your weekly health insights.",
       });
+      
+      // Trigger completion callback
+      if (onComplete) {
+        setTimeout(() => onComplete(), 1000); // Delay for better UX
+      }
     } catch (error) {
       console.error('Error saving weekly checkin:', error);
       toast({

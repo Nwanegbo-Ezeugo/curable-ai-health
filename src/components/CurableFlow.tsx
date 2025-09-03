@@ -5,16 +5,19 @@ import OnboardingFlow from './OnboardingFlow';
 import DailyHealthQuestions from './DailyHealthQuestions';
 import WeeklyCheckin from './WeeklyCheckin';
 import EmergencyCheckin from './EmergencyCheckin';
+import HealthCharts from './HealthCharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, Calendar, TrendingUp, User } from 'lucide-react';
+import { AlertTriangle, Calendar, TrendingUp, User, BarChart3 } from 'lucide-react';
 
 export default function CurableFlow() {
   const { user } = useAuth();
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showEmergency, setShowEmergency] = useState(false);
+  const [showGraphs, setShowGraphs] = useState(false);
+  const [activeTab, setActiveTab] = useState('daily');
 
   useEffect(() => {
     if (user) {
@@ -47,6 +50,16 @@ export default function CurableFlow() {
 
   const handleEmergencySubmit = () => {
     setShowEmergency(false);
+  };
+
+  const handleDailyComplete = () => {
+    setShowGraphs(true);
+    setActiveTab('graphs');
+  };
+
+  const handleWeeklyComplete = () => {
+    setShowGraphs(true);
+    setActiveTab('graphs');
   };
 
   if (loading) {
@@ -116,9 +129,9 @@ export default function CurableFlow() {
 
       {/* Main Content Tabs */}
       <div className="px-4 pb-8">
-        <div className="max-w-lg mx-auto">
-          <Tabs defaultValue="daily" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-3">
+        <div className="max-w-4xl mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="daily" className="text-xs">
                 <Calendar className="h-4 w-4 mr-1" />
                 Daily
@@ -127,14 +140,18 @@ export default function CurableFlow() {
                 <TrendingUp className="h-4 w-4 mr-1" />
                 Weekly
               </TabsTrigger>
+              <TabsTrigger value="graphs" className="text-xs">
+                <BarChart3 className="h-4 w-4 mr-1" />
+                Insights
+              </TabsTrigger>
               <TabsTrigger value="profile" className="text-xs">
                 <User className="h-4 w-4 mr-1" />
                 Profile
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="daily" className="space-y-4">
-              <DailyHealthQuestions />
+            <TabsContent value="daily" className="space-y-4 animate-fade-in">
+              <DailyHealthQuestions onComplete={handleDailyComplete} />
               
               <Card>
                 <CardHeader>
@@ -150,8 +167,8 @@ export default function CurableFlow() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="weekly" className="space-y-4">
-              <WeeklyCheckin />
+            <TabsContent value="weekly" className="space-y-4 animate-fade-in">
+              <WeeklyCheckin onComplete={handleWeeklyComplete} />
               
               <Card>
                 <CardHeader>
@@ -163,6 +180,42 @@ export default function CurableFlow() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="graphs" className="space-y-4 animate-fade-in">
+              {showGraphs ? (
+                <div className="space-y-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5 text-primary" />
+                        Your Health Analytics
+                      </CardTitle>
+                      <CardDescription>
+                        AI-powered insights from your health data for better decision making
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                  <HealthCharts />
+                </div>
+              ) : (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Health Analytics</CardTitle>
+                    <CardDescription>
+                      Complete your daily or weekly check-ins to see your health insights
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <BarChart3 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-sm text-muted-foreground">
+                        Your personalized health charts and AI insights will appear here after completing check-ins
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
 
             <TabsContent value="profile" className="space-y-4">

@@ -106,7 +106,11 @@ const DAILY_QUESTIONS_POOL: DailyQuestion[] = [
   }
 ];
 
-export default function DailyHealthQuestions() {
+interface DailyHealthQuestionsProps {
+  onComplete?: () => void;
+}
+
+export default function DailyHealthQuestions({ onComplete }: DailyHealthQuestionsProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [todaysQuestions, setTodaysQuestions] = useState<DailyQuestion[]>([]);
@@ -212,6 +216,11 @@ export default function DailyHealthQuestions() {
         title: "Health questions completed!",
         description: "Thank you for tracking your daily health data.",
       });
+      
+      // Trigger completion callback
+      if (onComplete) {
+        setTimeout(() => onComplete(), 1000); // Delay for better UX
+      }
     } catch (error) {
       console.error('Error saving answers:', error);
       toast({
