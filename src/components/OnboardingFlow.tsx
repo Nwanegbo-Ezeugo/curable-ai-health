@@ -165,25 +165,30 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
               </div>
 
               <div>
-                <Label>Gender *</Label>
-                <RadioGroup
-                  value={data.gender}
-                  onValueChange={(value) => handleInputChange('gender', value)}
-                  className="mt-2"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" />
-                    <Label htmlFor="male">Male</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" />
-                    <Label htmlFor="female">Female</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="other" id="other" />
-                    <Label htmlFor="other">Other</Label>
-                  </div>
-                </RadioGroup>
+                <Label className="text-base font-semibold">Gender *</Label>
+                <div className="mt-3 grid grid-cols-3 gap-3">
+                  {[
+                    { value: 'male', label: 'Male', icon: '👨' },
+                    { value: 'female', label: 'Female', icon: '👩' },
+                    { value: 'other', label: 'Other', icon: '👤' }
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleInputChange('gender', option.value)}
+                      className={`
+                        flex flex-col items-center p-4 rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] touch-target
+                        ${data.gender === option.value 
+                          ? 'border-primary bg-primary/10 text-primary shadow-interactive' 
+                          : 'border-border bg-card hover:border-accent hover:bg-accent/10'
+                        }
+                      `}
+                    >
+                      <span className="text-2xl mb-2">{option.icon}</span>
+                      <span className="font-medium">{option.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div>
@@ -233,39 +238,55 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
             </div>
 
             <div>
-              <Label htmlFor="blood_group">Blood Group (if known)</Label>
-              <RadioGroup
-                value={data.blood_group}
-                onValueChange={(value) => handleInputChange('blood_group', value)}
-                className="mt-2 grid grid-cols-4 gap-2"
-              >
+              <Label className="text-base font-semibold">Blood Group (if known)</Label>
+              <div className="mt-3 grid grid-cols-4 gap-2">
                 {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((type) => (
-                  <div key={type} className="flex items-center space-x-2">
-                    <RadioGroupItem value={type} id={type} />
-                    <Label htmlFor={type} className="text-sm">{type}</Label>
-                  </div>
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => handleInputChange('blood_group', type)}
+                    className={`
+                      p-3 rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] font-semibold touch-target
+                      ${data.blood_group === type 
+                        ? 'border-primary bg-primary/10 text-primary shadow-interactive' 
+                        : 'border-border bg-card hover:border-accent hover:bg-accent/10'
+                      }
+                    `}
+                  >
+                    {type}
+                  </button>
                 ))}
-              </RadioGroup>
+              </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="smoker"
-                  checked={data.smoker}
-                  onCheckedChange={(checked) => handleInputChange('smoker', checked)}
-                />
-                <Label htmlFor="smoker">Do you smoke?</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="alcohol_drinker"
-                  checked={data.alcohol_drinker}
-                  onCheckedChange={(checked) => handleInputChange('alcohol_drinker', checked)}
-                />
-                <Label htmlFor="alcohol_drinker">Do you drink alcohol?</Label>
-              </div>
+              {[
+                { key: 'smoker', label: 'Do you smoke?', icon: '🚭' },
+                { key: 'alcohol_drinker', label: 'Do you drink alcohol?', icon: '🍷' }
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  type="button"
+                  onClick={() => handleInputChange(option.key as keyof OnboardingData, !data[option.key as keyof OnboardingData])}
+                  className={`
+                    w-full flex items-center gap-4 p-4 rounded-lg border-2 transition-all duration-200 hover:scale-[1.02] touch-target
+                    ${data[option.key as keyof OnboardingData] 
+                      ? 'border-primary bg-primary/10 text-primary shadow-interactive' 
+                      : 'border-border bg-card hover:border-accent hover:bg-accent/10'
+                    }
+                  `}
+                >
+                  <span className="text-2xl">{option.icon}</span>
+                  <span className="font-medium text-left flex-1">{option.label}</span>
+                  <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
+                    data[option.key as keyof OnboardingData] ? 'border-primary bg-primary' : 'border-muted-foreground'
+                  }`}>
+                    {data[option.key as keyof OnboardingData] && (
+                      <div className="w-2 h-2 rounded-full bg-primary-foreground"></div>
+                    )}
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
         );
@@ -280,16 +301,29 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
             
             <div>
               <Label className="text-base font-medium">Do you have any chronic conditions?</Label>
-              <div className="mt-3 space-y-2">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 {CHRONIC_CONDITIONS.map((condition) => (
-                  <div key={condition} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={condition}
-                      checked={data.chronic_conditions.includes(condition)}
-                      onCheckedChange={(checked) => handleArrayChange('chronic_conditions', condition, !!checked)}
-                    />
-                    <Label htmlFor={condition} className="text-sm">{condition}</Label>
-                  </div>
+                  <button
+                    key={condition}
+                    type="button"
+                    onClick={() => handleArrayChange('chronic_conditions', condition, !data.chronic_conditions.includes(condition))}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all duration-200 hover:scale-[1.02] touch-target
+                      ${data.chronic_conditions.includes(condition) 
+                        ? 'border-primary bg-primary/10 text-primary shadow-interactive' 
+                        : 'border-border bg-card hover:border-accent hover:bg-accent/10'
+                      }
+                    `}
+                  >
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                      data.chronic_conditions.includes(condition) ? 'border-primary bg-primary' : 'border-muted-foreground'
+                    }`}>
+                      {data.chronic_conditions.includes(condition) && (
+                        <div className="w-2 h-2 rounded-sm bg-primary-foreground"></div>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium">{condition}</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -321,16 +355,29 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
               <p className="text-sm text-muted-foreground mt-1 mb-3">
                 Select any conditions that run in your family
               </p>
-              <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
                 {FAMILY_HISTORY_CONDITIONS.map((condition) => (
-                  <div key={condition} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`family_${condition}`}
-                      checked={data.family_history.includes(condition)}
-                      onCheckedChange={(checked) => handleArrayChange('family_history', condition, !!checked)}
-                    />
-                    <Label htmlFor={`family_${condition}`} className="text-sm">{condition}</Label>
-                  </div>
+                  <button
+                    key={condition}
+                    type="button"
+                    onClick={() => handleArrayChange('family_history', condition, !data.family_history.includes(condition))}
+                    className={`
+                      flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all duration-200 hover:scale-[1.02] touch-target
+                      ${data.family_history.includes(condition) 
+                        ? 'border-primary bg-primary/10 text-primary shadow-interactive' 
+                        : 'border-border bg-card hover:border-accent hover:bg-accent/10'
+                      }
+                    `}
+                  >
+                    <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                      data.family_history.includes(condition) ? 'border-primary bg-primary' : 'border-muted-foreground'
+                    }`}>
+                      {data.family_history.includes(condition) && (
+                        <div className="w-2 h-2 rounded-sm bg-primary-foreground"></div>
+                      )}
+                    </div>
+                    <span className="text-sm font-medium">{condition}</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -355,9 +402,11 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
               {Array.from({ length: totalSteps }, (_, i) => (
                 <div
                   key={i}
-                  className={`h-2 w-8 rounded-full ${
-                    i + 1 <= currentStep ? 'bg-primary' : 'bg-muted'
-                  }`}
+                  className={`h-3 w-8 rounded-full transition-all duration-300 ${
+                    i + 1 <= currentStep 
+                      ? 'bg-gradient-to-r from-primary to-accent shadow-glow' 
+                      : 'bg-muted'
+                  } ${i + 1 === currentStep ? 'scale-110' : ''}`}
                 />
               ))}
             </div>
@@ -370,6 +419,7 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
               {currentStep > 1 && (
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={prevStep}
                   disabled={isLoading}
                   className="flex-1"
@@ -378,11 +428,13 @@ export default function OnboardingFlow({ onComplete }: { onComplete: () => void 
                 </Button>
               )}
               <Button
+                variant={currentStep === totalSteps ? "gradient" : "default"}
+                size="lg"
                 onClick={nextStep}
                 disabled={isLoading}
-                className="flex-1"
+                className={`flex-1 ${currentStep === totalSteps ? 'animate-pulse-glow' : ''}`}
               >
-                {currentStep === totalSteps ? 'Complete Setup' : 'Next'}
+                {currentStep === totalSteps ? '✨ Complete Setup' : 'Next Step'}
               </Button>
             </div>
           </CardContent>
