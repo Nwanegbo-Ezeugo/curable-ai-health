@@ -9,10 +9,12 @@ import HealthCharts from './HealthCharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertTriangle, Calendar, TrendingUp, User, BarChart3 } from 'lucide-react';
+import { AlertTriangle, Calendar, TrendingUp, User, BarChart3, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CurableFlow() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [onboardingCompleted, setOnboardingCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showEmergency, setShowEmergency] = useState(false);
@@ -115,14 +117,23 @@ export default function CurableFlow() {
 
       {/* Emergency Button */}
       <div className="p-4">
-        <div className="max-w-lg mx-auto">
+        <div className="max-w-lg mx-auto space-y-4">
           <Button
             onClick={() => setShowEmergency(true)}
             variant="destructive"
-            className="w-full mb-6 py-6 text-lg"
+            className="w-full py-6 text-lg"
           >
             <AlertTriangle className="h-6 w-6 mr-2" />
             Emergency Symptom Check
+          </Button>
+          
+          <Button
+            onClick={() => navigate('/mental-health-crisis')}
+            variant="secondary"
+            className="w-full py-6 text-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-200 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-pink-500/20 text-foreground"
+          >
+            <Heart className="h-6 w-6 mr-2 text-purple-600" />
+            Mental Health Support
           </Button>
         </div>
       </div>

@@ -194,6 +194,60 @@ export type Database = {
         }
         Relationships: []
       }
+      mental_health_assessments: {
+        Row: {
+          created_at: string
+          feeling_today: string | null
+          has_support_person: boolean | null
+          hopelessness_explanation: string | null
+          hopelessness_loss_interest: boolean | null
+          id: string
+          is_flagged_urgent: boolean | null
+          mood_score: number | null
+          self_harm_thoughts: boolean | null
+          sleep_changes: string | null
+          stress_anxiety_details: string | null
+          stress_anxiety_overwhelm: boolean | null
+          thought_heaviness_scale: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feeling_today?: string | null
+          has_support_person?: boolean | null
+          hopelessness_explanation?: string | null
+          hopelessness_loss_interest?: boolean | null
+          id?: string
+          is_flagged_urgent?: boolean | null
+          mood_score?: number | null
+          self_harm_thoughts?: boolean | null
+          sleep_changes?: string | null
+          stress_anxiety_details?: string | null
+          stress_anxiety_overwhelm?: boolean | null
+          thought_heaviness_scale?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feeling_today?: string | null
+          has_support_person?: boolean | null
+          hopelessness_explanation?: string | null
+          hopelessness_loss_interest?: boolean | null
+          id?: string
+          is_flagged_urgent?: boolean | null
+          mood_score?: number | null
+          self_harm_thoughts?: boolean | null
+          sleep_changes?: string | null
+          stress_anxiety_details?: string | null
+          stress_anxiety_overwhelm?: boolean | null
+          thought_heaviness_scale?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       onboarding: {
         Row: {
           alcohol_drinker: boolean | null
