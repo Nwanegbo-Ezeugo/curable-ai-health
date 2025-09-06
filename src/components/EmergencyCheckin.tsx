@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -161,20 +161,33 @@ export default function EmergencyCheckin({ onSubmit }: { onSubmit?: () => void }
 
             <div>
               <Label>How severe are your symptoms? *</Label>
-              <RadioGroup
+              <ToggleGroup
+                type="single"
                 value={data.severity_level}
-                onValueChange={(value) => handleInputChange('severity_level', value)}
-                className="mt-3"
+                onValueChange={(value) => value && handleInputChange('severity_level', value)}
+                className="mt-3 grid grid-cols-1 gap-3"
               >
                 {SEVERITY_LEVELS.map((level) => (
-                  <div key={level.value} className="flex items-center space-x-2">
-                    <RadioGroupItem value={level.value} id={level.value} />
-                    <Label htmlFor={level.value} className={level.color}>
-                      {level.label}
-                    </Label>
-                  </div>
+                  <ToggleGroupItem
+                    key={level.value}
+                    value={level.value}
+                    className={`h-16 w-full justify-start text-left font-medium transition-all hover:scale-105 data-[state=on]:ring-2 data-[state=on]:ring-primary ${
+                      level.value === 'mild' ? 'border-green-200 bg-green-50 hover:bg-green-100 data-[state=on]:bg-green-100 data-[state=on]:text-green-800' :
+                      level.value === 'moderate' ? 'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 data-[state=on]:bg-yellow-100 data-[state=on]:text-yellow-800' :
+                      'border-red-200 bg-red-50 hover:bg-red-100 data-[state=on]:bg-red-100 data-[state=on]:text-red-800'
+                    }`}
+                  >
+                    <div className="flex flex-col items-start">
+                      <span className="text-lg">{level.label}</span>
+                      <span className="text-sm opacity-70">
+                        {level.value === 'mild' ? 'Manageable discomfort' :
+                         level.value === 'moderate' ? 'Noticeable impact on daily activities' :
+                         'Severe impact requiring immediate attention'}
+                      </span>
+                    </div>
+                  </ToggleGroupItem>
                 ))}
-              </RadioGroup>
+              </ToggleGroup>
             </div>
           </div>
         );
@@ -200,24 +213,35 @@ export default function EmergencyCheckin({ onSubmit }: { onSubmit?: () => void }
 
             <div>
               <Label>Are your symptoms getting worse or better?</Label>
-              <RadioGroup
-                value={data.getting_worse?.toString() || ''}
-                onValueChange={(value) => handleInputChange('getting_worse', value === 'true')}
-                className="mt-3"
+              <ToggleGroup
+                type="single"
+                value={data.getting_worse === true ? 'true' : data.getting_worse === false ? 'false' : 'same'}
+                onValueChange={(value) => {
+                  if (value === 'true') handleInputChange('getting_worse', true);
+                  else if (value === 'false') handleInputChange('getting_worse', false);
+                  else handleInputChange('getting_worse', null);
+                }}
+                className="mt-3 grid grid-cols-1 gap-3"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="true" id="worse" />
-                  <Label htmlFor="worse" className="text-red-600">Getting worse</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="false" id="better" />
-                  <Label htmlFor="better" className="text-green-600">Getting better</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="same" id="same" />
-                  <Label htmlFor="same">Staying the same</Label>
-                </div>
-              </RadioGroup>
+                <ToggleGroupItem
+                  value="true"
+                  className="h-14 w-full justify-start text-left font-medium transition-all hover:scale-105 border-red-200 bg-red-50 hover:bg-red-100 data-[state=on]:bg-red-100 data-[state=on]:text-red-800 data-[state=on]:ring-2 data-[state=on]:ring-red-500"
+                >
+                  <span className="text-red-600">Getting worse</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="false"
+                  className="h-14 w-full justify-start text-left font-medium transition-all hover:scale-105 border-green-200 bg-green-50 hover:bg-green-100 data-[state=on]:bg-green-100 data-[state=on]:text-green-800 data-[state=on]:ring-2 data-[state=on]:ring-green-500"
+                >
+                  <span className="text-green-600">Getting better</span>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="same"
+                  className="h-14 w-full justify-start text-left font-medium transition-all hover:scale-105 border-muted bg-muted/20 hover:bg-muted/40 data-[state=on]:bg-muted data-[state=on]:text-foreground data-[state=on]:ring-2 data-[state=on]:ring-primary"
+                >
+                  <span>Staying the same</span>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
           </div>
         );
@@ -254,20 +278,31 @@ export default function EmergencyCheckin({ onSubmit }: { onSubmit?: () => void }
 
             <div>
               <Label>Do you want to connect to a doctor immediately?</Label>
-              <RadioGroup
+              <ToggleGroup
+                type="single"
                 value={data.wants_doctor_connection?.toString() || ''}
                 onValueChange={(value) => handleInputChange('wants_doctor_connection', value === 'true')}
-                className="mt-3"
+                className="mt-3 grid grid-cols-1 gap-3"
               >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="true" id="connect_yes" />
-                  <Label htmlFor="connect_yes">Yes, connect me to a doctor now</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="false" id="connect_no" />
-                  <Label htmlFor="connect_no">No, I'll monitor for now</Label>
-                </div>
-              </RadioGroup>
+                <ToggleGroupItem
+                  value="true"
+                  className="h-16 w-full justify-start text-left font-medium transition-all hover:scale-105 border-primary bg-primary/10 hover:bg-primary/20 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:ring-2 data-[state=on]:ring-primary"
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="text-base">Yes, connect me to a doctor now</span>
+                    <span className="text-sm opacity-70">Get immediate medical consultation</span>
+                  </div>
+                </ToggleGroupItem>
+                <ToggleGroupItem
+                  value="false"
+                  className="h-16 w-full justify-start text-left font-medium transition-all hover:scale-105 border-muted bg-muted/20 hover:bg-muted/40 data-[state=on]:bg-muted data-[state=on]:text-foreground data-[state=on]:ring-2 data-[state=on]:ring-primary"
+                >
+                  <div className="flex flex-col items-start">
+                    <span className="text-base">No, I'll monitor for now</span>
+                    <span className="text-sm opacity-70">Continue self-monitoring symptoms</span>
+                  </div>
+                </ToggleGroupItem>
+              </ToggleGroup>
             </div>
 
             <div className="bg-muted/50 p-4 rounded-lg">
