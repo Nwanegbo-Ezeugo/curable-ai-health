@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -285,17 +285,22 @@ export default function DailyHealthQuestions({ onComplete }: DailyHealthQuestion
           <h3 className="text-lg font-medium mb-4">{currentQuestion.question}</h3>
           
           {currentQuestion.type === 'radio' && currentQuestion.options && (
-            <RadioGroup
+            <ToggleGroup
+              type="single"
               value={answers[currentQuestion.field] || ''}
-              onValueChange={(value) => handleAnswer(currentQuestion.field, value)}
+              onValueChange={(value) => value && handleAnswer(currentQuestion.field, value)}
+              className="grid grid-cols-1 gap-3"
             >
               {currentQuestion.options.map((option) => (
-                <div key={option} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option} id={option} />
-                  <Label htmlFor={option}>{option}</Label>
-                </div>
+                <ToggleGroupItem
+                  key={option}
+                  value={option}
+                  className="h-16 w-full justify-start text-left font-medium transition-all hover:scale-105 border-2 border-border/20 bg-card/50 backdrop-blur-sm hover:bg-card/80 hover:border-primary/40 hover:shadow-xl data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:ring-2 data-[state=on]:ring-primary"
+                >
+                  <span className="text-base">{option}</span>
+                </ToggleGroupItem>
               ))}
-            </RadioGroup>
+            </ToggleGroup>
           )}
           
           {currentQuestion.type === 'number' && (
