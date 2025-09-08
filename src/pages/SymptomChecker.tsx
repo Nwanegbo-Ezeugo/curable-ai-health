@@ -9,13 +9,15 @@ import { Stethoscope, MessageSquare, LogOut, AlertTriangle, CheckCircle, Clock }
 
 interface SymptomAssessment {
   id: string;
+  user_id: string;
   symptoms: string;
-  aiDiagnosis: string;
-  confidence: number;
+  ai_diagnosis: string;
+  suspected_conditions: string[];
   recommendations: string[];
-  urgency: 'low' | 'medium' | 'high';
-  timestamp: Date;
-  doctorReviewed: boolean;
+  confidence_score: number;
+  urgency_level: 'low' | 'medium' | 'high';
+  created_at: string;
+  doctor_reviewed: boolean;
 }
 
 export default function SymptomChecker() {
@@ -29,47 +31,45 @@ export default function SymptomChecker() {
     
     setIsLoading(true);
     
-    // Simulate AI processing and save to database
-    setTimeout(async () => {
-      const mockAssessment: SymptomAssessment = {
-        id: Date.now().toString(),
-        symptoms: symptoms,
-        aiDiagnosis: "Based on your symptoms, this appears to be a common cold or upper respiratory infection. Using GPT-4 medical analysis.",
-        confidence: 78,
-        recommendations: [
-          "Get plenty of rest",
-          "Stay hydrated with warm fluids",
-          "Consider over-the-counter pain relievers",
-          "Monitor symptoms for 3-5 days"
-        ],
-        urgency: 'low',
-        timestamp: new Date(),
-        doctorReviewed: false
-      };
+    try {
+      // Call AI diagnosis edge function
+      const { data, error } = await supabase.functions.invoke('ai-diagnose', {
+        body: { symptoms: symptoms }
+      });
       
-      // Save to database
-      if (user) {
-        try {
-          await supabase
-            .from('symptom_assessments')
-            .insert({
-              user_id: user.id,
-              symptoms: symptoms,
-              ai_diagnosis: mockAssessment.aiDiagnosis,
-              confidence_score: mockAssessment.confidence,
-              urgency_level: mockAssessment.urgency,
-              recommendations: mockAssessment.recommendations,
-              suspected_conditions: ["Common Cold", "Upper Respiratory Infection"],
-              doctor_reviewed: false
-            });
-        } catch (error) {
-          console.error('Error saving assessment:', error);
-        }
+      if (error) {
+        console.error('AI diagnosis error:', error);
+        return;
       }
       
-      setAssessment(mockAssessment);
+      if (!data?.success) {
+        console.error('AI diagnosis failed:', data?.error);
+        return;
+      }
+      
+      const aiAssessment = data.assessment;
+      
+      // Create assessment object for UI
+      const newAssessment: SymptomAssessment = {
+        id: aiAssessment.id,
+        user_id: user?.id || '',
+        symptoms: aiAssessment.symptoms,
+        ai_diagnosis: aiAssessment.ai_diagnosis,
+        suspected_conditions: aiAssessment.suspected_conditions,
+        recommendations: aiAssessment.recommendations,
+        confidence_score: aiAssessment.confidence_score,
+        urgency_level: aiAssessment.urgency_level,
+        created_at: aiAssessment.created_at,
+        doctor_reviewed: false
+      };
+      
+      setAssessment(newAssessment);
+      
+    } catch (error) {
+      console.error('Error during symptom assessment:', error);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const getUrgencyColor = (urgency: string) => {
@@ -167,12 +167,12 @@ export default function SymptomChecker() {
                       <CheckCircle className="h-5 w-5 text-primary" />
                       AI Assessment Results
                     </CardTitle>
-                    <Badge variant={getUrgencyColor(assessment.urgency)}>
-                      {assessment.urgency.toUpperCase()} PRIORITY
+                     <Badge variant={getUrgencyColor(assessment.urgency_level)}>
+                      {assessment.urgency_level.toUpperCase()} PRIORITY
                     </Badge>
                   </div>
                   <CardDescription>
-                    Confidence Level: {assessment.confidence}%
+                    Confidence Level: {assessment.confidence_score}%
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -184,14 +184,27 @@ export default function SymptomChecker() {
                   </div>
                   
                   <div>
-                    <h4 className="font-semibold mb-2">AI Diagnosis (GPT-4 powered):</h4>
+                    <h4 className="font-semibold mb-2">AI Diagnosis (GPT-4.1 powered):</h4>
                     <p className="text-muted-foreground">
-                      {assessment.aiDiagnosis}
+                      {assessment.ai_diagnosis}
                     </p>
                     <div className="mt-2 p-2 bg-muted/30 rounded text-xs text-muted-foreground">
-                      AI Model: GPT-4 Medical Analysis • Confidence: {assessment.confidence}%
+                      AI Model: GPT-4.1 Medical Analysis • Confidence: {assessment.confidence_score}%
                     </div>
                   </div>
+                  
+                  {assessment.suspected_conditions.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Suspected Conditions:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {assessment.suspected_conditions.map((condition, index) => (
+                          <Badge key={index} variant="secondary">
+                            {condition}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   <div>
                     <h4 className="font-semibold mb-2">Recommendations:</h4>
