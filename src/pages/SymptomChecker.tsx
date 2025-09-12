@@ -39,11 +39,13 @@ export default function SymptomChecker() {
       
       if (error) {
         console.error('AI diagnosis error:', error);
+        alert(`Error: ${error.message || 'Failed to get AI diagnosis'}`);
         return;
       }
       
       if (!data?.success) {
         console.error('AI diagnosis failed:', data?.error);
+        alert(`Assessment failed: ${data?.error || 'Unknown error occurred'}`);
         return;
       }
       

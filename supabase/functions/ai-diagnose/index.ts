@@ -21,7 +21,14 @@ serve(async (req) => {
     // Get the authorization header to get user
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      console.error('No authorization header provided');
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Authentication required' 
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Create Supabase client with service role for comprehensive data access
@@ -32,15 +39,18 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
-    // Set the auth header for user client
-    userSupabase.auth.setSession({
-      access_token: authHeader.replace('Bearer ', ''),
-      refresh_token: '',
-    });
-
-    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
+    // Extract token and get user directly
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser(token);
     if (userError || !user) {
-      throw new Error('Invalid user token');
+      console.error('Invalid user token:', userError?.message);
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: 'Invalid authentication token' 
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const { symptoms } = await req.json();
